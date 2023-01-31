@@ -3,6 +3,7 @@ The project is focused on delivering rough image recognition using rgb values an
 
 # Code
 Most of the graphics api used to capture images is multiple-source code.
+Very much still a work in progress.
 
 # Compilation
 Program compiles using Visual Studio 2022 Community with C++ 17 support.
