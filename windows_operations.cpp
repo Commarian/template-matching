@@ -51,9 +51,9 @@ void WO::MonitorWindows(BS::thread_pool& pool, bool &s_d)
         std::future<void> future_3 = pool.submit(MO::ReturnCursor);
         future_3.wait();
 
-        game_running = 0;
+        game_running = 1;
         
-
+        
         //A game is running
         if (game_running != 0) {
             //CSGO is running
@@ -62,7 +62,8 @@ void WO::MonitorWindows(BS::thread_pool& pool, bool &s_d)
                 _sleeptimer = 2;
                 //std::this_thread::sleep_for(std::chrono::seconds(4));
                 //Match the template with the screenshot based on which game running
-                //return_location = SS::ScreenCapture(game_running);                   
+                return_location = SS::ScreenCapture(game_running);
+
             }
             //Dota 2 is running
             else if (game_running == 2)

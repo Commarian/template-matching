@@ -48,6 +48,9 @@
     <ClInclude Include="windows_operations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GPUCompute.cuh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutoAccept.cpp">
@@ -91,6 +94,9 @@
     </None>
     <None Include="_cs.src">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="GPUCompute.cu">
+      <Filter>Source Files</Filter>
     </None>
   </ItemGroup>
 </Project>

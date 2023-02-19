@@ -17,6 +17,8 @@
 #include "ScreenCapture.h"
 #include "_log.h"
 #include "image_native.h"
+#include "GPUCompute.cu"
+
 
 
 #pragma comment(lib, "D3D11.lib")
@@ -513,6 +515,7 @@ namespace SS {
 			}
 
 
+
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 			ULONG_PTR gdiplusToken;
 			//GDIPLUS INITIALIZATION
@@ -566,11 +569,9 @@ namespace SS {
 			double ref_size = ref_width * ref_height;
 			//makes sure the vector is not filled with empty/redundant data
 			pBuf.shrink_to_fit();
-			//vector for our reference with only RGB not Alpha channel included
-			vector<_RGB> ref_vector{};
-			
-			vector<double> position_vector{};
+
 			//_RGB rgbx[] = {{0,0,0},{0,0,0}};
+
 
 
 			/*
@@ -598,73 +599,80 @@ namespace SS {
 			auto now = std::chrono::system_clock::now() + std::chrono::hours(2);
 			test = std::format("{:%d-%m-%Y %H:%M:%OS}", now) + "\tTIME BEFORE\n";
 			OutputDebugStringA(test.c_str());
-			try {
-				for (int i = 0; i < (ref_size - 4); i++) {
-					unsigned char r = pBuf.at((i * 4) + 2);
-					unsigned char g = pBuf.at((i * 4) + 1);
-					unsigned char b = pBuf.at(i * 4);
-					/*
-					if (g > 85 && r < g/2 && b < g/2) {
-						std::string temp = "{" + to_string(r) + "," +
-							to_string(g) + "," + to_string(b) + "}";
-						if (!(colors.find(temp) != std::string::npos)) {
-							colors += temp + ",";
-						};
+			
+			//try {
+			//	for (int i = 0; i < (ref_size - 4); i++) {
+			//		unsigned char r = pBuf.at((i * 4) + 2);
+			//		unsigned char g = pBuf.at((i * 4) + 1);
+			//		unsigned char b = pBuf.at(i * 4);
+			//		/*
+			//		if (g > 85 && r < g/2 && b < g/2) {
+			//			std::string temp = "{" + to_string(r) + "," +
+			//				to_string(g) + "," + to_string(b) + "}";
+			//			if (!(colors.find(temp) != std::string::npos)) {
+			//				colors += temp + ",";
+			//			};
 
-					}*/
+			//		}*/
 
-					
-					//vector<_RGB> found_colors{};
-					_RGB rgb{ NULL };
-					if (game_running == 1) {
-						for (_RGB rgbt : cs_colors) {
-							if (r == rgbt.r && g == rgbt.g && b == rgbt.b) {
-								rgb.r = r;
-								rgb.g = g;
-								rgb.b = b;
-								int c = 0;
-								for (_RGB vec_rgb : ref_vector) {
-									if (r == vec_rgb.r && g == vec_rgb.g && b == vec_rgb.b) {
-										c++;
-										continue;
-									}
-								}
-								if (c == 0) {
-									ref_vector.push_back(rgb);
-									position_vector.push_back(i);
-								}
-							}
-						}
-					}
-					else {
-						for (_RGB rgbt : dota_colors) {
-							if (r == rgbt.r && g == rgbt.g && b == rgbt.b) {
-								rgb.r = r;
-								rgb.g = g;
-								rgb.b = b;
-								int c = 0;
-								for (_RGB vec_rgb : ref_vector) {
-									if (r == vec_rgb.r && g == vec_rgb.g && b == vec_rgb.b) {
-										c++;
-										continue;
-									}
-								}
-								if (c == 0) {
-									ref_vector.push_back(rgb);
-									position_vector.push_back(i);
-								}
-							}
-						}
-					}
-				}
-			}
-			catch (std::exception e) {
-				test = e.what();
-				_log::log("\nERROR -SC");
-				_log::log(test);
-				_log::log("\nERROR -SC");
-			}
 
+			//		//vector<_RGB> found_colors{};
+			//		_RGB rgb{ NULL };
+			//		if (game_running == 1) {
+			//			for (_RGB rgbt : cs_colors) {
+			//				if (r == rgbt.r && g == rgbt.g && b == rgbt.b) {
+			//					rgb.r = r;
+			//					rgb.g = g;
+			//					rgb.b = b;
+			//					int c = 0;
+			//					for (_RGB vec_rgb : ref_vector) {
+			//						if (r == vec_rgb.r && g == vec_rgb.g && b == vec_rgb.b) {
+			//							c++;
+			//							continue;
+			//						}
+			//					}
+			//					if (c == 0) {
+			//						ref_vector.push_back(rgb);
+			//						position_vector.push_back(i);
+			//					}
+			//				}
+			//			}
+			//		}
+			//		else {
+			//			for (_RGB rgbt : dota_colors) {
+			//				if (r == rgbt.r && g == rgbt.g && b == rgbt.b) {
+			//					rgb.r = r;
+			//					rgb.g = g;
+			//					rgb.b = b;
+			//					int c = 0;
+			//					for (_RGB vec_rgb : ref_vector) {
+			//						if (r == vec_rgb.r && g == vec_rgb.g && b == vec_rgb.b) {
+			//							c++;
+			//							continue;
+			//						}
+			//					}
+			//					if (c == 0) {
+			//						ref_vector.push_back(rgb);
+			//						position_vector.push_back(i);
+			//					}
+			//				}
+			//			}
+			//		}
+			//	}
+			//}
+			//catch (std::exception e) {
+			//	test = e.what();
+			//	_log::log("\nERROR -SC");
+			//	_log::log(test);
+			//	_log::log("\nERROR -SC");
+			//}
+
+			std::tuple<std::vector<GPUCompute::_RGB>, std::vector<double>> computed_vectors = GPUCompute::Compute(pBuf, ref_size, game_running);
+			//vector for our reference with only RGB not Alpha channel included
+			vector<GPUCompute::_RGB> ref_vector = std::get<0>(computed_vectors);
+
+			vector<double> position_vector = std::get<1>(computed_vectors);
+			
 			_log::log(colors);
 
 			now = std::chrono::system_clock::now() + std::chrono::hours(2);
@@ -677,7 +685,7 @@ namespace SS {
 			OutputDebugStringA("\n");
 			if (ref_vector.capacity() < colors_to_match) {
 				OutputDebugStringA("less than 90% matched");
-				return std::make_tuple(glob_x, glob_y);
+				return  std::make_tuple(glob_x, glob_y);
 			}
 
 
