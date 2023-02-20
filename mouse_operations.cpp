@@ -1,5 +1,5 @@
+#include <windows.h>
 #include "mouse_operations.h"
-
 #include <thread>
 #include <string>
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <windows.h>
 #include "bs_threading.h"
 
 namespace WO

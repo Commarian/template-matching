@@ -1,5 +1,4 @@
 #define WIN32_LEAN_AND_MEAN    
-
 #include <windows.h>
 #include <shlobj.h>
 #include <shellapi.h>
@@ -17,7 +16,7 @@
 #include "ScreenCapture.h"
 #include "_log.h"
 #include "image_native.h"
-#include "GPUCompute.cu"
+
 
 
 
@@ -492,7 +491,7 @@ namespace SS {
 			}
 			;
 			using std::vector;
-			vector<BYTE> pBuf(8294400);
+			vector<unsigned char> pBuf(8294400);
 			//BYTE pBuf[8294400]{};
 
 
@@ -667,9 +666,9 @@ namespace SS {
 			//	_log::log("\nERROR -SC");
 			//}
 
-			std::tuple<std::vector<GPUCompute::_RGB>, std::vector<double>> computed_vectors = GPUCompute::Compute(pBuf, ref_size, game_running);
+			std::tuple<std::vector<std::tuple<unsigned char, unsigned char, unsigned char>>, std::vector<double>> computed_vectors = GPUCompute::Compute(pBuf, ref_size, game_running);
 			//vector for our reference with only RGB not Alpha channel included
-			vector<GPUCompute::_RGB> ref_vector = std::get<0>(computed_vectors);
+			vector<std::tuple<unsigned char, unsigned char, unsigned char>> ref_vector = std::get<0>(computed_vectors);
 
 			vector<double> position_vector = std::get<1>(computed_vectors);
 			

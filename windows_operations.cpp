@@ -1,8 +1,8 @@
+#include <windows.h>
 #include "windows_operations.h"
 #include <string>
 #include <thread>
 #include <chrono>
-#include <Windows.h>
 #include "wi.h"
 #include "mouse_operations.h"
 #include "_log.h"
