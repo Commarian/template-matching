@@ -92,6 +92,7 @@
     <None Include="_cs.src">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="GPUCompute.cu">

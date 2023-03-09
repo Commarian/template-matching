@@ -497,8 +497,8 @@ namespace SS {
 
 			UINT lBmpRowPitch = lOutputDuplDesc.ModeDesc.Width * 4;
 
-			BYTE* sptr = reinterpret_cast<BYTE*>(resource.pData);
-			BYTE* dptr = pBuf.data() + lOutputDuplDesc.ModeDesc.Width
+			unsigned char* sptr = reinterpret_cast<unsigned char*>(resource.pData);
+			unsigned char* dptr = pBuf.data() + lOutputDuplDesc.ModeDesc.Width
 				* lOutputDuplDesc.ModeDesc.Height * 4 - lBmpRowPitch;
 
 			unsigned char* imageData = nullptr;
@@ -561,13 +561,13 @@ namespace SS {
 			//_log::log(to_string(ref_size));
 			std::string test = "";		
 			//remove a part of the screen image
-			pBuf.erase(pBuf.end() - height_to_remove_half * res_width * 4, pBuf.end());//200 y units from top
-			pBuf.erase(pBuf.begin(), pBuf.begin() + height_to_remove_half * res_width * 4);//200 y units from bottom
+			//pBuf.erase(pBuf.end() - height_to_remove_half * res_width * 4, pBuf.end());//200 y units from top
+			//pBuf.erase(pBuf.begin(), pBuf.begin() + height_to_remove_half * res_width * 4);//200 y units from bottom
 			double ref_height = res_height - height_to_remove_half * 2;
 			double ref_width = res_width;
 			double ref_size = ref_width * ref_height;
 			//makes sure the vector is not filled with empty/redundant data
-			pBuf.shrink_to_fit();
+			//pBuf.shrink_to_fit();
 
 			//_RGB rgbx[] = {{0,0,0},{0,0,0}};
 
@@ -665,64 +665,63 @@ namespace SS {
 			//	_log::log(test);
 			//	_log::log("\nERROR -SC");
 			//}
-
-			std::tuple<std::vector<std::tuple<unsigned char, unsigned char, unsigned char>>, std::vector<double>> computed_vectors = GPUCompute::Compute(pBuf, ref_size, game_running);
-			//vector for our reference with only RGB not Alpha channel included
-			vector<std::tuple<unsigned char, unsigned char, unsigned char>> ref_vector = std::get<0>(computed_vectors);
-
-			vector<double> position_vector = std::get<1>(computed_vectors);
+			GPUCompute::Compute(pBuf, ref_size, game_running);
+			std::string computed_array;
+			
 			
 			_log::log(colors);
-
-			now = std::chrono::system_clock::now() + std::chrono::hours(2);
-			test = std::format("{:%d-%m-%Y %H:%M:%OS}", now) + "\tTIME AFTER+\n";
-			OutputDebugStringA(test.c_str());
-			pBuf.clear();
-			ref_vector.shrink_to_fit();
-			OutputDebugStringA("\nref_vector capacity = ");
-			OutputDebugStringA(to_string(ref_vector.capacity()).c_str());
-			OutputDebugStringA("\n");
-			if (ref_vector.capacity() < colors_to_match) {
-				OutputDebugStringA("less than 90% matched");
-				return  std::make_tuple(glob_x, glob_y);
-			}
-
-
-			double pos_sum = 0;
-			double pos_pseudo = 0;
-			int pos_pseudo_counter = 0;
-			for (double x : position_vector) {
-				pos_sum += x;
-			}
-			double pos_avg = pos_sum/position_vector.capacity();
-
-
-			for (double x : position_vector) {
-
-				if (x > (pos_avg + (100 * ref_width * 2)) || x < (pos_avg - (100 * ref_width * 2))) {
-				}
-				else {
-					pos_pseudo += x;
-					pos_pseudo_counter++;
-				}
-
-			}
-
-			pos_avg = pos_pseudo / pos_pseudo_counter;
-			OutputDebugStringA("\npos_pseudo_counter = ");
-			OutputDebugStringA(to_string(pos_pseudo_counter).c_str());
-			OutputDebugStringA("\npos_pseudo = ");
-			OutputDebugStringA(to_string(pos_pseudo).c_str());
+			OutputDebugStringA("Resulting String");
+			OutputDebugStringA(computed_array.c_str());
 			
-			if (pos_avg < 0) {
-				return std::make_tuple(glob_x, glob_y);
-			}
-			int local_y = res_height - ((pos_avg / res_width) + height_to_remove_half);
-			if (local_y <= 0) {
-				return std::make_tuple(glob_x, glob_y);
-			}
-			glob_y = local_y;
-			glob_x = res_width/2;
+
+			//now = std::chrono::system_clock::now() + std::chrono::hours(2);
+			//test = std::format("{:%d-%m-%Y %H:%M:%OS}", now) + "\tTIME AFTER+\n";
+			//OutputDebugStringA(test.c_str());
+			//pBuf.clear();
+			//OutputDebugStringA("\nref_vector capacity = ");
+			//OutputDebugStringA(to_string(ref_vector.capacity()).c_str());
+			//OutputDebugStringA("\n");
+			//if (ref_vector.capacity() < colors_to_match) {
+			//	OutputDebugStringA("less than 90% matched");
+			//	return  std::make_tuple(glob_x, glob_y);
+			//}
+
+
+			//double pos_sum = 0;
+			//double pos_pseudo = 0;
+			//int pos_pseudo_counter = 0;
+			//for (double x : position_vector) {
+			//	pos_sum += x;
+			//}
+			//double pos_avg = pos_sum/position_vector.capacity();
+
+
+			//for (double x : position_vector) {
+
+			//	if (x > (pos_avg + (100 * ref_width * 2)) || x < (pos_avg - (100 * ref_width * 2))) {
+			//	}
+			//	else {
+			//		pos_pseudo += x;
+			//		pos_pseudo_counter++;
+			//	}
+
+			//}
+
+			//pos_avg = pos_pseudo / pos_pseudo_counter;
+			//OutputDebugStringA("\npos_pseudo_counter = ");
+			//OutputDebugStringA(to_string(pos_pseudo_counter).c_str());
+			//OutputDebugStringA("\npos_pseudo = ");
+			//OutputDebugStringA(to_string(pos_pseudo).c_str());
+			//
+			//if (pos_avg < 0) {
+			//	return std::make_tuple(glob_x, glob_y);
+			//}
+			//int local_y = res_height - ((pos_avg / res_width) + height_to_remove_half);
+			//if (local_y <= 0) {
+			//	return std::make_tuple(glob_x, glob_y);
+			//}
+			//glob_y = local_y;
+			//glob_x = res_width/2;
 			return std::make_tuple(glob_x, glob_y);
 
 		} while (false);
